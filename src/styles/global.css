@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand colors */
+  --color-papaya-whip: #fff2db; /* Light neutral */
+  --color-coffee-bean: #1c0000; /* Dark neutral */
+  --color-amber-flame: #ffba19; /* Primary brand color */
+  --color-olive: #99913f; /* Secondary/supporting color */
+  --color-muted-teal: #6fada0; /* Accent / Call-to-Action color */
+
+  /* Typography */
+  --font-sans: "Montserrat", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-coffee-bean);
+    background-color: var(--color-papaya-whip);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+@layer components {
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    padding: 0.5rem 1rem;
+    background-color: var(--color-coffee-bean);
+    color: var(--color-papaya-whip);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    transition: top 0.1s ease;
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+}

@@ -1,0 +1,108 @@
+---
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/services', label: 'Services' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
+] as const;
+
+const pathname = Astro.url.pathname;
+
+function isActive(href: string): boolean {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+}
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-papaya-whip/95 backdrop-blur-sm border-b border-coffee-bean/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Mobile: single row with centered name + hamburger -->
+    <div class="flex items-center h-14 md:hidden">
+      <!-- Ghost spacer balances the hamburger so name stays centered -->
+      <span class="w-8 shrink-0" aria-hidden="true"></span>
+
+      <a
+        href="/"
+        class="flex-1 text-center font-serif text-2xl text-coffee-bean tracking-wider hover:text-olive transition-colors duration-200"
+        aria-label="Studio.io — Home"
+      >
+        <span class="text-amber-flame">Studio</span>.<span class="text-amber-flame">io</span>
+      </a>
+
+      <details class="group w-8 shrink-0 flex justify-end">
+        <summary
+          class="list-none cursor-pointer text-coffee-bean hover:text-olive transition-colors duration-200"
+          aria-label="Toggle navigation menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="group-open:hidden" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+          </svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="hidden group-open:block" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </summary>
+
+        <nav
+          aria-label="Mobile navigation"
+          class="fixed top-14 left-0 right-0 bg-papaya-whip border-b border-coffee-bean/10 shadow-lg"
+        >
+          <ul class="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1" role="list">
+            {navItems.map(({ href, label }) => (
+              <li>
+                <a
+                  href={href}
+                  class:list={[
+                    'block font-serif text-sm tracking-widest uppercase py-3 transition-colors duration-200',
+                    isActive(href)
+                      ? 'text-amber-flame'
+                      : 'text-coffee-bean hover:text-olive',
+                  ]}
+                  aria-current={isActive(href) ? 'page' : undefined}
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+    </div>
+
+    <!-- Desktop: name centered on top, nav row below -->
+    <div class="hidden md:block">
+      <div class="pt-6 pb-4 text-center">
+        <a
+          href="/"
+          class="font-serif text-4xl text-amber-flame tracking-wider hover:text-coffee-bean transition-colors duration-200"
+          aria-label="Studio.io — Home"
+        >
+          Studio.io
+        </a>
+      </div>
+
+      <nav aria-label="Main navigation" class="border-t border-coffee-bean/10">
+        <ul class="flex justify-center gap-10 lg:gap-14 py-3" role="list">
+          {navItems.map(({ href, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  'font-serif text-sm font-medium tracking-widest uppercase transition-colors duration-200',
+                  isActive(href)
+                    ? 'text-amber-flame'
+                    : 'text-coffee-bean hover:text-olive',
+                ]}
+                aria-current={isActive(href) ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>

@@ -1,0 +1,52 @@
+---
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/services', label: 'Services' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/contact', label: 'Contact' },
+] as const;
+
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-olive text-papaya-whip">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-2 md:pb-4">
+
+    <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+
+      <!-- Logo -->
+      <a
+        href="/"
+        class="font-serif text-2xl md:text-3xl text-papaya-whip tracking-wide hover:text-amber-flame transition-colors duration-200"
+        aria-label="Studio.io — Home"
+      >
+        Studio<span class="text-amber-flame">.</span>io
+      </a>
+
+      <!-- Footer navigation -->
+      <nav aria-label="Footer navigation">
+        <ul class="flex flex-wrap justify-center gap-6 md:gap-8" role="list">
+          {navItems.map(({ href, label }) => (
+            <li>
+              <a
+                href={href}
+                class="font-sans text-xs tracking-widest uppercase text-papaya-whip/60 hover:text-papaya-whip transition-colors duration-200"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+    </div>
+
+    <div class="mt-8 pt-4 border-t border-papaya-whip/10 text-center">
+      <p class="font-sans text-xs text-papaya-whip/40">
+        &copy; {year} Studio.io. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</footer>

@@ -1,11 +1,94 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/images/portfolio/*.jpg',
+  { eager: true },
+);
+const photos = Object.values(modules).map(m => m.default);
+
+// 9-slot grid — col classes drive the layout
+// Desktop (3-col): P | L·· / P·P·P / L·· | P / P | L··
+// Mobile  (2-col): all col-span-1 except last which spans full width
+const grid = [
+  'col-span-1',              // 0  portrait
+  'col-span-1 md:col-span-2', // 1  landscape on desktop
+  'col-span-1',              // 2  portrait
+  'col-span-1',              // 3  portrait
+  'col-span-1',              // 4  portrait
+  'col-span-1 md:col-span-2', // 5  landscape on desktop
+  'col-span-1',              // 6  portrait
+  'col-span-1',              // 7  portrait
+  'col-span-2',              // 8  landscape on both (full-width on mobile, 2/3 on desktop)
+] as const;
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<BaseLayout
+  title="Home"
+  description="Studio.io — Timeless wedding photography capturing every precious moment of your special day."
+>
+  <div class="max-w-6xl mx-auto px-2 sm:px-3">
+
+    <!-- Photo grid -->
+    <section aria-label="Featured photography" class="pt-6 md:pt-10">
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-1.5 auto-rows-[225px] md:auto-rows-[315px]">
+        {grid.map((colClass, i) => (
+          <div class:list={['overflow-hidden group', colClass]}>
+            <Image
+              src={photos[i % photos.length]}
+              alt={`Studio.io wedding photography, image ${i + 1}`}
+              width={678}
+              height={1024}
+              loading={i < 4 ? 'eager' : 'lazy'}
+              class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- View Full Portfolio — sits directly under the grid -->
+    <div class="mt-7 text-center">
+      <a
+        href="/portfolio"
+        class="inline-flex items-center gap-3 border border-coffee-bean text-coffee-bean px-8 py-3.5 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
+      >
+        View Full Portfolio
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Blurb -->
+    <section class="max-w-lg mx-auto py-20 md:py-28 text-center">
+
+      <p class="font-sans text-xs tracking-widest uppercase text-olive mb-6">
+        Wedding Photography
+      </p>
+
+      <h1 class="font-serif text-5xl md:text-6xl text-coffee-bean leading-[1.1] mb-8">
+        Capturing Your<br />Love Story
+      </h1>
+
+      <p class="font-sans text-sm text-coffee-bean/65 leading-relaxed mb-12">
+        Every wedding holds quiet moments — a glance, a laugh, a tear — that deserve
+        to live forever. We photograph them with honesty, warmth, and a timeless eye.
+      </p>
+
+      <!-- Contact CTA -->
+      <a
+        href="/contact"
+        class="inline-flex items-center gap-3 border border-coffee-bean text-coffee-bean px-8 py-3.5 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
+      >
+        Book Your Date
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+        </svg>
+      </a>
+
+    </section>
+
+  </div>
+</BaseLayout>

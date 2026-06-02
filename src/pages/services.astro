@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/images/portfolio/*.jpg',
+  { eager: true },
+);
+const photos = Object.values(modules).map(m => m.default);
+
+const services = [
+  {
+    title: 'Wedding Photography',
+    eyebrow: 'Our Signature Service',
+    description:
+      'From the first look to the final dance, we document every chapter of your wedding day with intention and artistry. Packages include a pre-wedding consultation, full-day coverage, and a curated online gallery delivered within six weeks.',
+    price: 'From $2,500',
+    featured: true,
+  },
+  {
+    title: 'Graduation Portraits',
+    eyebrow: 'Grad Season',
+    description:
+      "You've earned this moment. We'll capture your achievement with portraits that reflect your personality and the pride you feel — perfect for family gifts, announcements, and keepsakes.",
+    price: 'From $350',
+    featured: false,
+  },
+  {
+    title: 'Event Photography',
+    eyebrow: 'Celebrations & Occasions',
+    description:
+      'Galas, corporate events, milestone parties — we cover a wide range of occasions with a journalistic eye that captures the energy and emotion of the room.',
+    price: 'From $600',
+    featured: false,
+  },
+  {
+    title: 'Family Photography',
+    eyebrow: 'The People Who Matter Most',
+    description:
+      'Whether a lifestyle session at home or a curated outdoor shoot, our family sessions are relaxed, fun, and designed to show the real bonds between the people in the frame.',
+    price: 'From $450',
+    featured: false,
+  },
+  {
+    title: 'Portraits',
+    eyebrow: 'Individual Sessions',
+    description:
+      'Headshots, personal branding, and standalone portrait sessions for professionals, creatives, and anyone who wants a beautiful set of images that represents who they are.',
+    price: 'From $300',
+    featured: false,
+  },
+];
+
+const [wedding, ...additional] = services;
+---
+
+<BaseLayout
+  title="Services"
+  description="Studio.io photography services — weddings, graduations, events, family sessions, and portraits."
+>
+  <div class="max-w-6xl mx-auto px-2 sm:px-3">
+
+    <!-- Heading -->
+    <div class="pt-10 md:pt-14 pb-10 text-center">
+      <h1 class="font-serif text-5xl md:text-6xl text-coffee-bean">Services</h1>
+    </div>
+
+    <!-- ── Wedding (featured) ───────────────────────────────────────────────── -->
+    <section class="pb-10 md:pb-14">
+
+      <!-- Centered heading + blurb -->
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <p class="font-sans text-xs tracking-widest uppercase text-amber-flame mb-4">
+          {wedding.eyebrow}
+        </p>
+        <h2 class="font-serif text-4xl md:text-5xl text-coffee-bean leading-tight mb-5">
+          {wedding.title}
+        </h2>
+        <p class="font-sans text-sm text-coffee-bean/65 leading-relaxed mb-8">
+          {wedding.description}
+        </p>
+        <div class="flex flex-wrap justify-center items-center gap-6">
+          <span class="font-serif text-2xl text-coffee-bean/80">{wedding.price}</span>
+          <a
+            href="/contact"
+            class="inline-flex items-center gap-2.5 border border-coffee-bean text-coffee-bean px-6 py-3 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
+          >
+            Enquire
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3 photos in a row -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+        {[photos[0], photos[1], photos[2]].map((photo, i) => (
+          <div class="relative aspect-[2/3] overflow-hidden">
+            <Image
+              src={photo}
+              alt="Wedding photography"
+              width={480}
+              height={720}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+    </section>
+
+    <!-- ── Additional services (alternating) ──────────────────────────────── -->
+    {additional.map((service, i) => {
+      // i=0 Grad → image left; i=1 Event → image right; i=2 Family → left; i=3 Portraits → right
+      const imageLeft = i % 2 === 0;
+      return (
+        <section class={`border-t border-coffee-bean/10${i > 0 ? ' mt-10 md:mt-14' : ''}`}>
+          <!--
+            DOM: [image, text] — image top on mobile always.
+            md:flex-row-reverse when image should be on the right on desktop.
+          -->
+          <div class:list={[
+            'flex flex-col min-h-75 md:min-h-90',
+            imageLeft ? 'md:flex-row' : 'md:flex-row-reverse',
+          ]}>
+
+            <!-- Image -->
+            <div class="flex-1 relative min-h-60 md:min-h-0 overflow-hidden">
+              <Image
+                src={photos[(i + 1) % photos.length]}
+                alt={service.title}
+                width={678}
+                height={1024}
+                loading="lazy"
+                class="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- Text -->
+            <div class="flex-1 flex flex-col justify-center px-8 py-12 md:px-12 md:py-14">
+              <p class="font-sans text-xs tracking-widest uppercase text-olive mb-4 font-semibold">
+                {service.eyebrow}
+              </p>
+              <h2 class="font-serif text-3xl md:text-4xl text-coffee-bean leading-tight mb-4">
+                {service.title}
+              </h2>
+              <p class="font-sans text-sm text-coffee-bean/65 leading-relaxed mb-8 max-w-sm">
+                {service.description}
+              </p>
+              <div class="flex flex-wrap items-center gap-6">
+                <span class="font-serif text-xl text-coffee-bean/80">{service.price}</span>
+                <a
+                  href="/contact"
+                  class="inline-flex items-center gap-2.5 border border-coffee-bean text-coffee-bean px-6 py-3 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
+                >
+                  Enquire
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      );
+    })}
+
+    <div class="h-16 md:h-20"></div>
+
+  </div>
+</BaseLayout>

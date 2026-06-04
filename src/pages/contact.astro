@@ -216,7 +216,7 @@ const photos = Object.values(modules).map(m => m.default);
     checkAllFilled();
   });
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
 
     const name = (document.getElementById('name') as HTMLInputElement).value.trim();
@@ -225,14 +225,28 @@ const photos = Object.values(modules).map(m => m.default);
     const eventType = select.value;
     const message = (document.getElementById('message') as HTMLTextAreaElement).value.trim();
 
-    const subject = encodeURIComponent(`Studio.io Enquiry — ${eventType}`);
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nEvent Type: ${eventType}\n\nMessage:\n${message}`
-    );
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
 
-    window.location.href = `mailto:studio.io098@gmail.com?subject=${subject}&body=${body}`;
+    try {
+      const res = await fetch('/submit-form', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, eventType, message }),
+      });
 
-    form.classList.add('hidden');
-    successMsg.classList.remove('hidden');
+      if (!res.ok) {
+        const { error } = await res.json() as { error?: string };
+        throw new Error(error ?? 'Something went wrong.');
+      }
+
+      form.classList.add('hidden');
+      successMsg.classList.remove('hidden');
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = `Send Message <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" /></svg>`;
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      alert(msg);
+    }
   });
 </script>

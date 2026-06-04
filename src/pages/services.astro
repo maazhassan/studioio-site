@@ -96,7 +96,7 @@ const [wedding, ...additional] = services;
       <!-- 3 photos in a row -->
       <div class="grid grid-cols-3 gap-2 sm:gap-3">
         {[photos[0], photos[1], photos[2]].map((photo, i) => (
-          <div class="relative aspect-[2/3] overflow-hidden">
+          <div class="relative aspect-2/3 overflow-hidden">
             <Image
               src={photo}
               alt="Wedding photography"

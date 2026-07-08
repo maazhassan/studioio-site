@@ -3,45 +3,67 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image, getImage } from 'astro:assets';
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/portfolio/*.jpg',
+  '../assets/images/portfolio/*.{jpg,JPG,jpeg,JPEG}',
   { eager: true },
 );
-const photos = Object.values(modules).map(m => m.default);
 
-// Pre-generate large versions for lightbox (one per unique source image)
-const largePhotos = await Promise.all(
-  photos.map(photo => getImage({ src: photo, width: 900, format: 'webp', quality: 85 }))
-);
-
-// 24-slot grid with a 12-item repeating pattern (desktop 3-col):
-//   Row A: P · P · P          (indices 0,1,2  mod 12)
-//   Row B: L·· · P            (indices 3,4    mod 12 — 3 is wide)
-//   Row C: P · L··            (indices 5,6    mod 12 — 6 is wide)
-//   Row D: P · P · P          (indices 7,8,9  mod 12)
-//   Row E: L·· · P            (indices 10,11  mod 12 — 10 is wide)
-const TOTAL = 24;
-
-function colClass(i: number): string {
-  return [3, 6, 10].includes(i % 12) ? 'col-span-1 md:col-span-2' : 'col-span-1';
+const byName: Record<string, ImageMetadata> = {};
+for (const [path, mod] of Object.entries(modules)) {
+  const basename = path.split('/').pop()!;
+  byName[basename] = mod.default;
 }
 
-const captions = [
-  'A quiet moment before the ceremony.',
-  'The light through the chapel windows.',
-  'Details that tell your story.',
-  'Golden hour, just the two of you.',
-  'A celebration of love and family.',
-  'First dance under the stars.',
-  'Laughter shared between friends.',
-  'The vows that started everything.',
+// A740980 is not present in assets — skipped
+const columns = [
+  {
+    widthPx: 350,
+    files: [
+      '_A740217.jpg', '_A741207.jpg', 'DSC00057.JPG', '_A740445.jpg',
+      '_A740991.jpg', '_A740965.jpg', '_A740975.jpg', '_A741272.jpg', '_A741263.jpg',
+      '_A741295.jpg', '123.jpeg', '_A740223.jpg',
+    ],
+  },
+  {
+    widthPx: 428,
+    files: [
+      '_A740908.jpg', '_A740403.jpg', '_A741793.jpg', '_A741283.jpg',
+      '_A741013.jpg', '_A740935.jpg', '_A741772.jpg', '_A740912.jpg',
+      'DSC00144.JPG', '_A741315.jpg', '_A740909.jpg',
+    ],
+  },
+  {
+    widthPx: 350,
+    files: [
+      '_A740960.jpg', '_A741957.jpg', '_A741276.jpg', '_A741053.jpg',
+      'DSC00168.JPG', '_A740956.jpg', '_A741045.jpg', 'DSC00175.JPG',
+      '_A741969.jpg', '_A740944.jpg', 'DSC00044.JPG',
+    ],
+  },
 ];
+
+// Flatten for lightbox indexing (left → middle → right, top → bottom)
+const flatPhotos = columns.flatMap(col =>
+  col.files.filter(f => byName[f]).map(file => ({ file, widthPx: col.widthPx }))
+);
+
+const largePhotos = await Promise.all(
+  flatPhotos.map(({ file }) =>
+    getImage({ src: byName[file], width: 1200, format: 'webp', quality: 85 })
+  )
+);
+
+// Map file → lightbox index
+const lightboxIdx: Record<string, number> = {};
+flatPhotos.forEach(({ file }, i) => { lightboxIdx[file] = i; });
+
+let eagerCount = 0;
 ---
 
 <BaseLayout
   title="Portfolio"
   description="Browse the Studio.io portfolio — a collection of cherished moments and beautiful love stories."
 >
-  <div class="max-w-6xl mx-auto px-2 sm:px-3">
+  <div class="max-w-300 mx-auto px-2 sm:px-4">
 
     <!-- Heading -->
     <div class="pt-10 md:pt-14 pb-8 text-center">
@@ -50,35 +72,40 @@ const captions = [
 
     <!-- Grid -->
     <section aria-label="Portfolio gallery">
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-1.5 auto-rows-[270px] md:auto-rows-[390px]">
-        {Array.from({ length: TOTAL }, (_, i) => {
-          const photoIdx = i % photos.length;
-          return (
-            <button
-              type="button"
-              class:list={[
-                'overflow-hidden group cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-flame',
-                colClass(i),
-              ]}
-              data-lightbox-trigger
-              data-src={largePhotos[photoIdx].src}
-              data-alt={`Studio.io wedding photography, image ${i + 1}`}
-              data-desc={captions[i % captions.length]}
-              aria-label={`View photo ${i + 1}`}
-              aria-haspopup="dialog"
-            >
-              <Image
-                src={photos[photoIdx]}
-                alt=""
-                aria-hidden="true"
-                width={678}
-                height={1024}
-                loading={i < 6 ? 'eager' : 'lazy'}
-                class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none select-none"
-              />
-            </button>
-          );
-        })}
+      <div class="flex flex-col md:flex-row md:justify-center gap-1.5">
+        {columns.map((col) => (
+          <div
+            class="flex flex-col gap-1.5 w-full md:shrink-0"
+            style={`--col-w: ${col.widthPx}px`}
+          >
+            {col.files.filter(f => byName[f]).map((file) => {
+              const idx = lightboxIdx[file];
+              const large = largePhotos[idx];
+              const photo = byName[file];
+              const isEager = eagerCount++ < 6;
+              return (
+                <button
+                  type="button"
+                  class="block overflow-hidden group cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-flame"
+                  data-lightbox-trigger
+                  data-src={large.src}
+                  data-alt={`Studio.io wedding photography`}
+                  aria-label={`View photo`}
+                  aria-haspopup="dialog"
+                >
+                  <Image
+                    src={photo}
+                    alt=""
+                    aria-hidden="true"
+                    width={col.widthPx * 2}
+                    loading={isEager ? 'eager' : 'lazy'}
+                    class="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none select-none"
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ))}
       </div>
     </section>
 
@@ -94,18 +121,8 @@ const captions = [
     aria-label="Photo viewer"
     class="hidden fixed inset-0 z-200 backdrop-blur-3xl bg-papaya-whip/50"
   >
-    <!-- Transparent backdrop — clicking here closes the dialog -->
-    <button
-      id="lightbox-backdrop"
-      type="button"
-      aria-label="Close photo viewer"
-      class="absolute inset-0 w-full cursor-zoom-out"
-    ></button>
-
-    <!-- Controls layer — pointer-events-none so backdrop receives stray clicks -->
     <div class="absolute inset-0 flex items-center justify-between px-3 md:px-6 pointer-events-none">
 
-      <!-- Prev arrow -->
       <button
         id="lightbox-prev"
         type="button"
@@ -117,7 +134,6 @@ const captions = [
         </svg>
       </button>
 
-      <!-- Panel (image + caption) -->
       <div
         id="lightbox-panel"
         class="pointer-events-auto flex-1 flex flex-col items-center mx-3 md:mx-6 min-w-0"
@@ -128,13 +144,8 @@ const captions = [
           alt=""
           class="max-h-[88vh] w-auto max-w-full object-contain drop-shadow-2xl"
         />
-        <p
-          id="lightbox-desc"
-          class="mt-4 font-sans text-xs tracking-wide text-coffee-bean/70 bg-white/60 backdrop-blur-sm px-4 py-1.5 text-center"
-        ></p>
       </div>
 
-      <!-- Next arrow -->
       <button
         id="lightbox-next"
         type="button"
@@ -148,7 +159,6 @@ const captions = [
 
     </div>
 
-    <!-- Close button (top-right, above the controls layer) -->
     <button
       id="lightbox-close"
       type="button"
@@ -162,11 +172,17 @@ const captions = [
 
   </div>
 
+  <style>
+    @media (min-width: 768px) {
+      [style*="--col-w"] {
+        width: var(--col-w);
+      }
+    }
+  </style>
+
   <script>
     const lightbox  = document.getElementById('lightbox')!;
-    const backdrop  = document.getElementById('lightbox-backdrop')!;
     const img       = document.getElementById('lightbox-img') as HTMLImageElement;
-    const desc      = document.getElementById('lightbox-desc')!;
     const closeBtn  = document.getElementById('lightbox-close')!;
     const prevBtn   = document.getElementById('lightbox-prev')!;
     const nextBtn   = document.getElementById('lightbox-next')!;
@@ -178,9 +194,8 @@ const captions = [
     function show(idx: number) {
       currentIdx = (idx + triggers.length) % triggers.length;
       const t = triggers[currentIdx];
-      img.src          = t.dataset.src  ?? '';
-      img.alt          = t.dataset.alt  ?? '';
-      desc.textContent = t.dataset.desc ?? '';
+      img.src = t.dataset.src ?? '';
+      img.alt = t.dataset.alt ?? '';
     }
 
     function open(trigger: HTMLElement) {
@@ -197,18 +212,15 @@ const captions = [
       lastFocused?.focus();
     }
 
-    // Open
     triggers.forEach(el => el.addEventListener('click', () => open(el)));
 
-    // Close
-    backdrop.addEventListener('click', close);
-    closeBtn.addEventListener('click', close);
+    // Click anywhere on the lightbox closes it; stop propagation on the image and nav buttons
+    lightbox.addEventListener('click', close);
+    img.addEventListener('click', e => e.stopPropagation());
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); show(currentIdx - 1); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); show(currentIdx + 1); });
+    closeBtn.addEventListener('click', e => { e.stopPropagation(); close(); });
 
-    // Navigate
-    prevBtn.addEventListener('click', () => show(currentIdx - 1));
-    nextBtn.addEventListener('click', () => show(currentIdx + 1));
-
-    // Keyboard
     document.addEventListener('keydown', e => {
       if (lightbox.classList.contains('hidden')) return;
       if (e.key === 'Escape')      { close(); }
@@ -216,7 +228,6 @@ const captions = [
       if (e.key === 'ArrowRight')  { e.preventDefault(); show(currentIdx + 1); }
     });
 
-    // Focus trap
     lightbox.addEventListener('keydown', e => {
       if (e.key !== 'Tab' || lightbox.classList.contains('hidden')) return;
       const focusable = Array.from(

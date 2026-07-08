@@ -44,7 +44,7 @@ export const onRequestPost = async ({ request, env }) => {
     },
     body: JSON.stringify({
       from: "Contact Form <contact@studioio.ca>",
-      to: "maazh49@gmail.com",
+      to: "studio.io098@gmail.com",
       reply_to: `${name} <${email}>`,
       subject: `Studio.io Enquiry — ${name} (${eventType})`,
       html,

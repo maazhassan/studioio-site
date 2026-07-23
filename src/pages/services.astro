@@ -10,43 +10,51 @@ const photos = Object.values(modules).map(m => m.default);
 
 const services = [
   {
-    title: 'Wedding Photography',
+    title: 'Engagement & Wedding Photography',
     eyebrow: 'Our Signature Service',
     description:
-      'From the first look to the final dance, we document every chapter of your wedding day with intention and artistry. Packages include a pre-wedding consultation, full-day coverage, and a curated online gallery delivered within six weeks.',
-    price: 'From $2,500',
+      'Every wedding tells a unique story, and our goal is to preserve it in its entirety. We capture every meaningful glance, heartfelt embrace, and unforgettable celebration from multiple perspectives, ensuring every detail and emotion is beautifully documented.\n\n Our customizable wedding collections are designed around your vision and can include personalized consultation, timeline planning, full-day coverage, optional engagement or bridal sessions, thoughtfully selected photo locations, a curated digital gallery, content creation for the day, instant Polaroid keepsakes on your wedding day, and an online gallery delivered soon after your celebration, allowing you to relive your memories for years to come.',
+    price: 'From $150/hr',
     featured: true,
-  },
-  {
-    title: 'Graduation Portraits',
-    eyebrow: 'Grad Season',
-    description:
-      "You've earned this moment. We'll capture your achievement with portraits that reflect your personality and the pride you feel — perfect for family gifts, announcements, and keepsakes.",
-    price: 'From $350',
-    featured: false,
   },
   {
     title: 'Event Photography',
     eyebrow: 'Celebrations & Occasions',
     description:
-      'Galas, corporate events, milestone parties — we cover a wide range of occasions with a journalistic eye that captures the energy and emotion of the room.',
-    price: 'From $600',
+      'Every event tells a unique story. From corporate gatherings and sporting events to academic ceremonies, food and hospitality experiences, and special celebrations, we capture each moment with a documentary-style approach that highlights authentic interactions and the atmosphere of your event. The result is a collection of professional images perfect for preserving memories while elevating your marketing, social media, and promotional content.',
+    price: 'From $90/hr',
     featured: false,
   },
   {
     title: 'Family Photography',
     eyebrow: 'The People Who Matter Most',
     description:
-      'Whether a lifestyle session at home or a curated outdoor shoot, our family sessions are relaxed, fun, and designed to show the real bonds between the people in the frame.',
-    price: 'From $450',
+      'From birthdays, anniversaries, baby showers, and family reunions to holiday gatherings and photoshoots, and other special celebrations, we capture genuine connections, laughter, and memories that make your family unique. Our natural, candid approach creates timeless photographs you\'ll cherish and share for generations.',
+    price: 'From $90/hr',
     featured: false,
   },
   {
-    title: 'Portraits',
+    title: 'Graduation Portraits',
+    eyebrow: 'Grad Season',
+    description:
+      "We\'ll capture your achievement with portraits that reflect your personality, your accomplishment, and your future! This Package will include a 2 hour photoshoot, curated gallery of photos of your pride, personality, family photos, and your school. Perfect for family gifts, announcements and keepsakes.",
+    price: 'From $200',
+    featured: false,
+  },
+  {
+    title: 'Portraits & Headshots',
     eyebrow: 'Individual Sessions',
     description:
-      'Headshots, personal branding, and standalone portrait sessions for professionals, creatives, and anyone who wants a beautiful set of images that represents who they are.',
-    price: 'From $300',
+      'We\'ll capture your vision in a professional space with portraits that reflect your personality, your accomplishments, and your future! This Package will include a 30 minute to an hour photoshoot in professional and work settings. You will receive a small curated gallery of photos to use for your profession. Perfect for Linkedin, business cards, websites, etc.',
+    price: 'From $60',
+    featured: false,
+  },
+  {
+    title: 'Automotive Photography',
+    eyebrow: 'For the Meet',
+    description:
+      'Every vehicle has a story, and we\'ll capture it with images that showcase its design, personality, and attention to detail. Whether it\'s a personal project, a freshly detailed vehicle, a modified build, a dealership listing, or coverage of a car meet, this package includes a 30-minute to 1-hour photoshoot at carefully selected locations and a curated gallery of professionally edited images. Perfect for collectors, enthusiasts, businesses, online sales, and automotive marketing.',
+    price: 'From $80',
     featured: false,
   },
 ];
@@ -68,33 +76,8 @@ const [wedding, ...additional] = services;
     <!-- ── Wedding (featured) ───────────────────────────────────────────────── -->
     <section class="pb-10 md:pb-14">
 
-      <!-- Centered heading + blurb -->
-      <div class="text-center max-w-xl mx-auto mb-10">
-        <p class="font-sans text-xs tracking-widest uppercase text-amber-flame mb-4">
-          {wedding.eyebrow}
-        </p>
-        <h2 class="font-serif text-4xl md:text-5xl text-coffee-bean leading-tight mb-5">
-          {wedding.title}
-        </h2>
-        <p class="font-sans text-sm text-coffee-bean/65 leading-relaxed mb-8">
-          {wedding.description}
-        </p>
-        <div class="flex flex-wrap justify-center items-center gap-6">
-          <span class="font-serif text-2xl text-coffee-bean/80">{wedding.price}</span>
-          <a
-            href="/contact"
-            class="inline-flex items-center gap-2.5 border border-coffee-bean text-coffee-bean px-6 py-3 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
-          >
-            Enquire
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-            </svg>
-          </a>
-        </div>
-      </div>
-
       <!-- 3 photos in a row -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+      <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-10">
         {[photos[0], photos[1], photos[2]].map((photo, i) => (
           <div class="relative aspect-2/3 overflow-hidden">
             <Image
@@ -107,6 +90,31 @@ const [wedding, ...additional] = services;
             />
           </div>
         ))}
+      </div>
+
+      <!-- Centered heading + blurb -->
+      <div class="text-center max-w-xl mx-auto">
+        <p class="font-sans text-xs tracking-widest uppercase text-olive font-semibold mb-4">
+          {wedding.eyebrow}
+        </p>
+        <h2 class="font-serif text-4xl md:text-5xl text-coffee-bean leading-tight mb-5">
+          {wedding.title}
+        </h2>
+        <p class="font-sans text-sm text-coffee-bean/65 leading-relaxed mb-8 whitespace-pre-line">
+          {wedding.description}
+        </p>
+        <div class="flex flex-wrap justify-center items-center gap-6">
+          <span class="font-serif text-2xl text-coffee-bean/80 font-semibold">{wedding.price}</span>
+          <a
+            href="/contact"
+            class="inline-flex items-center gap-2.5 border border-coffee-bean text-coffee-bean px-6 py-3 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
+          >
+            Inquire
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+            </svg>
+          </a>
+        </div>
       </div>
 
     </section>
@@ -150,12 +158,12 @@ const [wedding, ...additional] = services;
                 {service.description}
               </p>
               <div class="flex flex-wrap items-center gap-6">
-                <span class="font-serif text-xl text-coffee-bean/80">{service.price}</span>
+                <span class="font-serif text-xl text-coffee-bean/80 font-semibold">{service.price}</span>
                 <a
                   href="/contact"
                   class="inline-flex items-center gap-2.5 border border-coffee-bean text-coffee-bean px-6 py-3 font-sans text-xs tracking-widest uppercase transition-colors duration-300 hover:border-muted-teal hover:bg-muted-teal hover:text-papaya-whip"
                 >
-                  Enquire
+                  Inquire
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
                   </svg>

@@ -1,4 +1,6 @@
 ---
+import logoSvg from '../assets/images/logo.svg?raw';
+
 const navItems = [
   { href: '/', label: 'Home' },
   { href: '/portfolio', label: 'Portfolio' },
@@ -15,83 +17,93 @@ function isActive(href: string): boolean {
 }
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-papaya-whip/95 backdrop-blur-sm border-b border-coffee-bean/10">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<header class="fixed top-0 left-0 right-0 z-50 border-b border-coffee-bean/10">
 
-    <!-- Mobile: single row with centered name + hamburger -->
-    <div class="flex items-center h-14 md:hidden">
-      <!-- Ghost spacer balances the hamburger so name stays centered -->
-      <span class="w-8 shrink-0" aria-hidden="true"></span>
+  <!-- Top bar: logo. Full-bleed coffee-bean background. -->
+  <div class="bg-coffee-bean">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <a
-        href="/"
-        class="flex-1 text-center font-serif text-2xl text-coffee-bean tracking-wider hover:text-olive transition-colors duration-200"
-        aria-label="Studio.io — Home"
-      >
-        <span class="text-amber-flame">Studio</span>.<span class="text-amber-flame">io</span>
-      </a>
+      <!-- Mobile: single row with centered logo + hamburger -->
+      <div class="flex items-center h-14 md:hidden">
+        <!-- Ghost spacer balances the hamburger so logo stays centered -->
+        <span class="w-8 shrink-0" aria-hidden="true"></span>
 
-      <details class="group w-8 shrink-0 flex justify-end">
-        <summary
-          class="list-none cursor-pointer text-coffee-bean hover:text-olive transition-colors duration-200"
-          aria-label="Toggle navigation menu"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="group-open:hidden" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-          </svg>
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="hidden group-open:block" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
-        </summary>
-
-        <nav
-          aria-label="Mobile navigation"
-          class="fixed top-14 left-0 right-0 bg-papaya-whip border-b border-coffee-bean/10 shadow-lg"
-        >
-          <ul class="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1" role="list">
-            {navItems.map(({ href, label }) => (
-              <li>
-                <a
-                  href={href}
-                  class:list={[
-                    'block font-serif text-sm tracking-widest uppercase py-3 transition-colors duration-200',
-                    isActive(href)
-                      ? 'text-amber-flame'
-                      : 'text-coffee-bean hover:text-olive',
-                  ]}
-                  aria-current={isActive(href) ? 'page' : undefined}
-                >
-                  {label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </details>
-    </div>
-
-    <!-- Desktop: name centered on top, nav row below -->
-    <div class="hidden md:block">
-      <div class="pt-6 pb-4 text-center">
         <a
           href="/"
-          class="font-serif text-4xl text-amber-flame tracking-wider hover:text-coffee-bean transition-colors duration-200"
+          class="logo-mark relative flex-1 flex justify-center text-amber-flame hover:text-olive transition-colors duration-200 [&_svg]:h-8 [&_svg]:w-auto"
           aria-label="Studio.io — Home"
         >
-          Studio.io
+          <span set:html={logoSvg} />
+          <span class="logo-hover-bridge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></span>
+        </a>
+
+        <details class="group w-8 shrink-0 flex justify-end">
+          <summary
+            class="list-none cursor-pointer text-papaya-whip hover:text-amber-flame transition-colors duration-200"
+            aria-label="Toggle navigation menu"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="group-open:hidden" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" class="hidden group-open:block" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </summary>
+
+          <nav
+            aria-label="Mobile navigation"
+            class="fixed top-14 left-0 right-0 bg-papaya-whip border-b border-coffee-bean/10 shadow-lg"
+          >
+            <ul class="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1" role="list">
+              {navItems.map(({ href, label }) => (
+                <li>
+                  <a
+                    href={href}
+                    class:list={[
+                      'block font-serif text-sm tracking-widest uppercase py-3 transition-colors duration-200',
+                      isActive(href)
+                        ? 'text-amber-flame'
+                        : 'text-coffee-bean hover:text-olive',
+                    ]}
+                    aria-current={isActive(href) ? 'page' : undefined}
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </details>
+      </div>
+
+      <!-- Desktop: logo centered -->
+      <div class="hidden md:flex justify-center pt-2 pb-2">
+        <a
+          href="/"
+          aria-label="Studio.io — Home"
+          class="logo-mark relative text-amber-flame hover:text-olive transition-colors duration-200 [&_svg]:h-20 [&_svg]:w-auto"
+        >
+          <span set:html={logoSvg} />
+          <span class="logo-hover-bridge absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" aria-hidden="true"></span>
         </a>
       </div>
 
-      <nav aria-label="Main navigation" class="border-t border-coffee-bean/10">
+    </div>
+  </div>
+
+  <!-- Nav row: bg-papaya-whip/95 backdrop-blur-sm -->
+  <div class="bg-papaya-whip/95 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav aria-label="Main navigation" class="hidden md:block border-t border-coffee-bean/10">
         <ul class="flex justify-center gap-10 lg:gap-14 py-3" role="list">
           {navItems.map(({ href, label }) => (
             <li>
               <a
                 href={href}
                 class:list={[
-                  'font-serif text-sm font-medium tracking-widest uppercase transition-colors duration-200',
+                  'font-serif text-sm font-semibold tracking-widest uppercase transition-colors duration-200',
                   isActive(href)
-                    ? 'text-amber-flame'
+                    ? 'text-muted-teal'
                     : 'text-coffee-bean hover:text-olive',
                 ]}
                 aria-current={isActive(href) ? 'page' : undefined}
@@ -103,6 +115,25 @@ function isActive(href: string): boolean {
         </ul>
       </nav>
     </div>
-
   </div>
+
 </header>
+
+<style is:global>
+  /* Restrict hover/click on the logo to its painted strokes, not the SVG's transparent bounding box. */
+  .logo-mark,
+  .logo-mark svg {
+    pointer-events: none;
+  }
+
+  .logo-mark svg path {
+    pointer-events: auto;
+  }
+
+  /* Small hit-target bridging the negative space inside the logo (e.g. the O's interior). */
+  .logo-hover-bridge {
+    width: 60%;
+    height: 60%;
+    pointer-events: auto;
+  }
+</style>

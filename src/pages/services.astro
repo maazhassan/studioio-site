@@ -3,10 +3,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/portfolio/*.jpg',
+  '../assets/images/portfolio/*.{jpg,jpeg,JPG,JPEG,webp}',
   { eager: true },
 );
-const photos = Object.values(modules).map(m => m.default);
+
+const byName: Record<string, ImageMetadata> = {};
+for (const [path, mod] of Object.entries(modules)) {
+  const basename = path.split('/').pop()!;
+  byName[basename] = mod.default;
+}
 
 const services = [
   {
@@ -16,6 +21,7 @@ const services = [
       'Every wedding tells a unique story, and our goal is to preserve it in its entirety. We capture every meaningful glance, heartfelt embrace, and unforgettable celebration from multiple perspectives, ensuring every detail and emotion is beautifully documented.\n\n Our customizable wedding collections are designed around your vision and can include personalized consultation, timeline planning, full-day coverage, optional engagement or bridal sessions, thoughtfully selected photo locations, a curated digital gallery, content creation for the day, instant Polaroid keepsakes on your wedding day, and an online gallery delivered soon after your celebration, allowing you to relive your memories for years to come.',
     price: 'From $150/hr',
     featured: true,
+    images: ['rt_12.webp', 'rt_1.webp', 'rt_46.webp'],
   },
   {
     title: 'Event Photography',
@@ -24,6 +30,7 @@ const services = [
       'Every event tells a unique story. From corporate gatherings and sporting events to academic ceremonies, food and hospitality experiences, and special celebrations, we capture each moment with a documentary-style approach that highlights authentic interactions and the atmosphere of your event. The result is a collection of professional images perfect for preserving memories while elevating your marketing, social media, and promotional content.',
     price: 'From $90/hr',
     featured: false,
+    image: '_A741295.jpg',
   },
   {
     title: 'Family Photography',
@@ -32,6 +39,7 @@ const services = [
       'From birthdays, anniversaries, baby showers, and family reunions to holiday gatherings and photoshoots, and other special celebrations, we capture genuine connections, laughter, and memories that make your family unique. Our natural, candid approach creates timeless photographs you\'ll cherish and share for generations.',
     price: 'From $90/hr',
     featured: false,
+    image: '_A741283.jpg',
   },
   {
     title: 'Graduation Portraits',
@@ -40,6 +48,7 @@ const services = [
       "We\'ll capture your achievement with portraits that reflect your personality, your accomplishment, and your future! This Package will include a 2 hour photoshoot, curated gallery of photos of your pride, personality, family photos, and your school. Perfect for family gifts, announcements and keepsakes.",
     price: 'From $200',
     featured: false,
+    image: 'IMG_3752.jpg',
   },
   {
     title: 'Portraits & Headshots',
@@ -48,6 +57,7 @@ const services = [
       'We\'ll capture your vision in a professional space with portraits that reflect your personality, your accomplishments, and your future! This Package will include a 30 minute to an hour photoshoot in professional and work settings. You will receive a small curated gallery of photos to use for your profession. Perfect for Linkedin, business cards, websites, etc.',
     price: 'From $60',
     featured: false,
+    image: '_A740445.jpg',
   },
   {
     title: 'Automotive Photography',
@@ -56,6 +66,7 @@ const services = [
       'Every vehicle has a story, and we\'ll capture it with images that showcase its design, personality, and attention to detail. Whether it\'s a personal project, a freshly detailed vehicle, a modified build, a dealership listing, or coverage of a car meet, this package includes a 30-minute to 1-hour photoshoot at carefully selected locations and a curated gallery of professionally edited images. Perfect for collectors, enthusiasts, businesses, online sales, and automotive marketing.',
     price: 'From $80',
     featured: false,
+    image: '_A741272.jpg',
   },
 ];
 
@@ -74,26 +85,9 @@ const [wedding, ...additional] = services;
     </div>
 
     <!-- ── Wedding (featured) ───────────────────────────────────────────────── -->
-    <section class="pb-10 md:pb-14">
-
-      <!-- 3 photos in a row -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-3 mb-10">
-        {[photos[0], photos[1], photos[2]].map((photo, i) => (
-          <div class="relative aspect-2/3 overflow-hidden">
-            <Image
-              src={photo}
-              alt="Wedding photography"
-              width={480}
-              height={720}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              class="absolute inset-0 w-full h-full object-cover"
-            />
-          </div>
-        ))}
-      </div>
-
+    <section class="pb-1 md:pb-2">
       <!-- Centered heading + blurb -->
-      <div class="text-center max-w-xl mx-auto">
+      <div class="text-center max-w-xl mx-auto mb-10">
         <p class="font-sans text-xs tracking-widest uppercase text-olive font-semibold mb-4">
           {wedding.eyebrow}
         </p>
@@ -117,6 +111,22 @@ const [wedding, ...additional] = services;
         </div>
       </div>
 
+      <!-- 3 photos in a row -->
+      <div class="grid grid-cols-3 gap-2 sm:gap-3">
+        {(wedding.images ?? []).map((filename, i) => (
+          <div class="relative aspect-2/3 overflow-hidden">
+            <Image
+              src={byName[filename]}
+              alt="Wedding photography"
+              width={480}
+              height={720}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              class="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
     </section>
 
     <!-- ── Additional services (alternating) ──────────────────────────────── -->
@@ -124,7 +134,7 @@ const [wedding, ...additional] = services;
       // i=0 Grad → image left; i=1 Event → image right; i=2 Family → left; i=3 Portraits → right
       const imageLeft = i % 2 === 0;
       return (
-        <section class={`border-t border-coffee-bean/10${i > 0 ? ' mt-10 md:mt-14' : ''}`}>
+        <section class={`border-t border-coffee-bean/10 mt-5 pt-5 md:mt-7 md:pt-7`}>
           <!--
             DOM: [image, text] — image top on mobile always.
             md:flex-row-reverse when image should be on the right on desktop.
@@ -137,7 +147,7 @@ const [wedding, ...additional] = services;
             <!-- Image -->
             <div class="flex-1 relative min-h-60 md:min-h-0 overflow-hidden">
               <Image
-                src={photos[(i + 1) % photos.length]}
+                src={byName[service.image!]}
                 alt={service.title}
                 width={678}
                 height={1024}

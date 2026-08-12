@@ -1,17 +1,45 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
+import ogPhoto from '../assets/images/portfolio/rt_10.webp';
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/portfolio/*.{jpg,jpeg,JPG}',
+  '../assets/images/portfolio/*.{jpg,jpeg,JPG,webp}',
   { eager: true },
 );
-const photos = Object.values(modules).map(m => m.default);
+
+const slideshowFilenames = [
+  'rt_10.webp',
+  'rt_60.webp',
+  'rt_7.webp',
+  'rt_52.webp',
+  'rt_15.webp',
+  'rt_16.webp',
+  'rt_18.webp',
+  'rt_53.webp',
+  'rt_30.webp',
+  'rt_31.webp',
+  'rt_43.webp',
+  'rt_49.webp',
+  'rt_61.webp',
+  'rt_63.webp',
+  '_A740975.jpg',
+  '_A741272.jpg',
+  '_A740223.jpg',
+  '_A740445.jpg',
+  '_A741283.jpg',
+  '_A741295.jpg',
+];
+
+const photos = slideshowFilenames.map(
+  filename => modules[`../assets/images/portfolio/${filename}`].default,
+);
 ---
 
 <BaseLayout
   title="Home"
   description="Studio.io — Timeless wedding photography capturing every precious moment of your special day."
+  ogImage={ogPhoto.src}
 >
   <div class="max-w-6xl mx-auto px-2 sm:px-3">
 
@@ -118,7 +146,7 @@ const photos = Object.values(modules).map(m => m.default);
 </style>
 
 <script>
-  const INTERVAL_MS = 5000;
+  const INTERVAL_MS = 2500;
   const DURATION_MS = 700;
 
   const container = document.getElementById('slideshow')!;
@@ -127,14 +155,9 @@ const photos = Object.values(modules).map(m => m.default);
   const prevBtn = document.getElementById('slide-prev')!;
   const nextBtn = document.getElementById('slide-next')!;
 
-  // Shuffle indices
   const order: number[] = Array.from({ length: slides.length }, (_, idx) => idx);
-  for (let i = order.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
-  }
 
-  // Re-apply shuffle: first in order goes to position 0, rest offscreen right
+  // First in order goes to position 0, rest offscreen right
   slides.forEach((s, i) => {
     s.style.transition = 'none';
     s.style.transform = 'translateX(100%)';
@@ -237,7 +260,7 @@ const photos = Object.values(modules).map(m => m.default);
 
   // Pause on hover
   container.addEventListener('mouseenter', () => clearInterval(timer));
-  container.addEventListener('mouseleave', startTimer);
+  container.addEventListener('mouseleave', resetTimer);
 
   // Swipe support for mobile
   let touchStartX = 0;

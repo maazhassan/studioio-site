@@ -7,9 +7,9 @@ export const onRequestPost = async ({ request, env }) => {
     return Response.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const { name, email, phone, eventType, message } = data;
+  const { name, email, phone, eventType, eventDate, message } = data;
 
-  if (!name || !email || !phone || !eventType || !message) {
+  if (!name || !email || !phone || !eventType || !eventDate || !message) {
     return Response.json(
       { error: "All fields are required." },
       { status: 400 },
@@ -18,6 +18,10 @@ export const onRequestPost = async ({ request, env }) => {
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return Response.json({ error: "Invalid email address." }, { status: 400 });
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(eventDate)) {
+    return Response.json({ error: "Invalid event date." }, { status: 400 });
   }
 
   const html = `
@@ -29,6 +33,7 @@ export const onRequestPost = async ({ request, env }) => {
       <tr><td style="padding-bottom:12px"><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
       <tr><td style="padding-bottom:12px"><strong>Phone:</strong> ${escapeHtml(phone)}</td></tr>
       <tr><td style="padding-bottom:12px"><strong>Event Type:</strong> ${escapeHtml(eventType)}</td></tr>
+      <tr><td style="padding-bottom:12px"><strong>Event Date:</strong> ${escapeHtml(formatDate(eventDate))}</td></tr>
       <tr><td style="padding-top:8px;border-top:1px solid #e5e0db">
         <p style="margin:12px 0 4px;font-weight:600">Message:</p>
         <p style="margin:0;white-space:pre-wrap;line-height:1.6">${escapeHtml(message)}</p>
@@ -62,6 +67,16 @@ export const onRequestPost = async ({ request, env }) => {
 
   return Response.json({ success: true }, { status: 200 });
 };
+
+function formatDate(dateStr) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 function escapeHtml(str) {
   return str

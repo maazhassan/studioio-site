@@ -1,4 +1,10 @@
 ---
+import { Icon } from 'astro-icon/components';
+import { getImage } from 'astro:assets';
+import footerPhotoSource from '../assets/images/portfolio/_A740218.jpg';
+
+const footerPhoto = await getImage({ src: footerPhotoSource, width: 1600, format: 'webp', quality: 80 });
+
 const navItems = [
   { href: '/', label: 'Home' },
   { href: '/portfolio', label: 'Portfolio' },
@@ -7,21 +13,30 @@ const navItems = [
   { href: '/contact', label: 'Contact' },
 ] as const;
 
+const socialItems = [
+  { href: 'https://www.instagram.com/_studio.io_', label: 'Instagram', icon: 'fa7-brands:square-instagram' },
+  { href: 'https://www.tiktok.com/@_studio.io_', label: 'TikTok', icon: 'fa7-brands:tiktok' },
+  { href: 'https://www.threads.com/@_studio.io_', label: 'Threads', icon: 'fa7-brands:square-threads' },
+  { href: '#', label: 'Facebook', icon: 'fa7-brands:square-facebook' },
+  { href: '#', label: 'LinkedIn', icon: 'fa7-brands:linkedin' },
+  { href: 'https://vs.co/uwkwnztj', label: 'VSCO', icon: 'fa7-brands:vsco' },
+] as const;
+
 const year = new Date().getFullYear();
 ---
 
 <footer class="bg-coffee-bean text-papaya-whip">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-10 pb-2 md:pb-4">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6 pb-8 md:pb-10">
 
     <div class="flex flex-col md:flex-row items-center justify-between gap-8">
 
       <!-- Logo -->
       <a
         href="/"
-        class="font-serif text-2xl md:text-3xl text-papaya-whip tracking-wide hover:text-amber-flame transition-colors duration-200"
+        class="font-serif text-2xl md:text-3xl text-amber-flame tracking-wide hover:text-papaya-whip transition-colors duration-200"
         aria-label="Studio.io — Home"
       >
-        Studio<span class="text-amber-flame">.</span>io
+        Studio<span class="text-papaya-whip">.</span>io
       </a>
 
       <!-- Footer navigation -->
@@ -42,11 +57,40 @@ const year = new Date().getFullYear();
 
     </div>
 
-    <div class="mt-8 pt-4 border-t border-papaya-whip/10 text-center">
-      <p class="font-sans text-xs text-papaya-whip/40">
+    <!-- Social links -->
+    <nav aria-label="Social media" class="mt-6">
+      <ul class="flex flex-wrap justify-center md:justify-end gap-6" role="list">
+        {socialItems.map(({ href, label, icon }) => (
+          <li>
+            <a
+              href={href}
+              aria-label={label}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-papaya-whip/60 hover:text-papaya-whip transition-colors duration-200"
+            >
+              <Icon name={icon} class="w-7 h-7" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+  </div>
+
+  <!-- Bottom strip: full-bleed photo (same source as the header, sliced from directly below
+       the header's band), darkened, with the copyright line over it. -->
+  <div class="relative overflow-hidden border-t border-papaya-whip/10">
+    <div
+      class="absolute inset-0 bg-no-repeat"
+      style={`background-image: url(${footerPhoto.src}); background-size: 100% auto; background-position: center calc(50% - 80px);`}
+      aria-hidden="true"
+    ></div>
+    <div class="absolute inset-0 bg-coffee-bean/35" aria-hidden="true"></div>
+    <div class="relative h-16 flex items-center justify-center">
+      <p class="font-sans text-xs text-coffee-bean font-semibold">
         &copy; {year} Studio.io. All rights reserved.
       </p>
     </div>
-
   </div>
 </footer>

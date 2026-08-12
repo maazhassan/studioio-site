@@ -1,5 +1,9 @@
 ---
+import { getImage } from 'astro:assets';
 import logoSvg from '../assets/images/logo.svg?raw';
+import headerPhotoSource from '../assets/images/portfolio/_A740218.jpg';
+
+const headerPhoto = await getImage({ src: headerPhotoSource, width: 1600, format: 'webp', quality: 80 });
 
 const navItems = [
   { href: '/', label: 'Home' },
@@ -19,9 +23,27 @@ function isActive(href: string): boolean {
 
 <header class="fixed top-0 left-0 right-0 z-50 border-b border-coffee-bean/10">
 
-  <!-- Top bar: logo. Full-bleed coffee-bean background. -->
-  <div class="bg-coffee-bean">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- Top bar: logo. Full-bleed coffee-bean background, flanked by photo halves on desktop. -->
+  <div class="relative bg-coffee-bean overflow-hidden">
+    <!-- Photo halves: each shows one half of the source image, split at its center, leaving a
+         400px brown island around the logo untouched (island edges = the image's true midpoint). -->
+    <div
+      class="hidden md:block absolute inset-y-0 left-0 w-[calc(50%-275px)] bg-no-repeat"
+      style={`background-image: url(${headerPhoto.src}); background-size: 200% auto; background-position: left center;`}
+      aria-hidden="true"
+    >
+      <div class="absolute inset-0 bg-coffee-bean/35"></div>
+    </div>
+
+    <div
+      class="hidden md:block absolute inset-y-0 right-0 w-[calc(50%-275px)] bg-no-repeat"
+      style={`background-image: url(${headerPhoto.src}); background-size: 200% auto; background-position: right center;`}
+      aria-hidden="true"
+    >
+      <div class="absolute inset-0 bg-coffee-bean/35"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <!-- Mobile: single row with centered logo + hamburger -->
       <div class="flex items-center h-14 md:hidden">

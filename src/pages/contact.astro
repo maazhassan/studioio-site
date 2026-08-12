@@ -3,10 +3,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/portfolio/*.jpg',
+  '../assets/images/portfolio/*.webp',
   { eager: true },
 );
-const photos = Object.values(modules).map(m => m.default);
+
+const byName: Record<string, ImageMetadata> = {};
+for (const [path, mod] of Object.entries(modules)) {
+  const basename = path.split('/').pop()!;
+  byName[basename] = mod.default;
+}
 ---
 
 <BaseLayout
@@ -25,7 +30,7 @@ const photos = Object.values(modules).map(m => m.default);
       <div class="w-40 sm:w-44 shrink-0">
         <div class="relative aspect-3/4 overflow-hidden">
           <Image
-            src={photos[0]}
+            src={byName["rt_4.webp"]}
             alt="Studio.io photography"
             width={176}
             height={234}
@@ -91,6 +96,49 @@ const photos = Object.values(modules).map(m => m.default);
           </div>
         </div>
 
+        <!-- Event Type + Event Date -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div class="relative">
+            <label for="event-type" class="block font-sans text-xs tracking-widest uppercase text-coffee-bean/60 mb-3">
+              Event Type
+            </label>
+            <select
+              id="event-type"
+              name="eventType"
+              required
+              class="w-full bg-transparent border-b border-coffee-bean/25 pb-2.5 font-sans text-sm focus:outline-none focus:border-muted-teal transition-colors duration-200 appearance-none cursor-pointer pr-8"
+            >
+              <option value="" disabled selected>Select an event type</option>
+              <option value="Wedding">Wedding</option>
+              <option value="Graduation">Graduation</option>
+              <option value="Corporate / Event">Corporate / Event</option>
+              <option value="Family">Family</option>
+              <option value="Portraits">Portraits</option>
+              <option value="Other">Other</option>
+            </select>
+            <!-- Chevron -->
+            <svg
+              class="absolute right-0 bottom-3 w-4 h-4 text-coffee-bean/40 pointer-events-none"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </div>
+          <div>
+            <label for="event-date" class="block font-sans text-xs tracking-widest uppercase text-coffee-bean/60 mb-3">
+              Event Date
+            </label>
+            <input
+              type="date"
+              id="event-date"
+              name="eventDate"
+              required
+              class="w-full bg-transparent border-b border-coffee-bean/25 pb-2.5 font-sans text-sm focus:outline-none focus:border-muted-teal transition-colors duration-200"
+            />
+          </div>
+        </div>
+
         <!-- Phone -->
         <div>
           <label for="phone" class="block font-sans text-xs tracking-widest uppercase text-coffee-bean/60 mb-3">
@@ -105,35 +153,6 @@ const photos = Object.values(modules).map(m => m.default);
             placeholder="+1 (000) 000-0000"
             class="w-full bg-transparent border-b border-coffee-bean/25 pb-2.5 font-sans text-sm text-coffee-bean placeholder:text-coffee-bean/30 focus:outline-none focus:border-muted-teal transition-colors duration-200"
           />
-        </div>
-
-        <!-- Event Type -->
-        <div class="relative">
-          <label for="event-type" class="block font-sans text-xs tracking-widest uppercase text-coffee-bean/60 mb-3">
-            Event Type
-          </label>
-          <select
-            id="event-type"
-            name="eventType"
-            required
-            class="w-full bg-transparent border-b border-coffee-bean/25 pb-2.5 font-sans text-sm focus:outline-none focus:border-muted-teal transition-colors duration-200 appearance-none cursor-pointer pr-8"
-          >
-            <option value="" disabled selected>Select an event type</option>
-            <option value="Wedding">Wedding</option>
-            <option value="Graduation">Graduation</option>
-            <option value="Corporate / Event">Corporate / Event</option>
-            <option value="Family">Family</option>
-            <option value="Portraits">Portraits</option>
-            <option value="Other">Other</option>
-          </select>
-          <!-- Chevron -->
-          <svg
-            class="absolute right-0 bottom-3 w-4 h-4 text-coffee-bean/40 pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"
-            aria-hidden="true"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-          </svg>
         </div>
 
         <!-- Message -->
@@ -192,6 +211,17 @@ const photos = Object.values(modules).map(m => m.default);
   select#event-type.has-value {
     color: var(--color-coffee-bean);
   }
+
+  /* Date input placeholder vs chosen value color */
+  input#event-date {
+    color: rgba(28, 0, 0, 0.3);
+  }
+  input#event-date.has-value {
+    color: var(--color-coffee-bean);
+  }
+  input#event-date::-webkit-datetime-edit {
+    color: inherit;
+  }
 </style>
 
 <script>
@@ -199,6 +229,7 @@ const photos = Object.values(modules).map(m => m.default);
   const btn = document.getElementById('submit-btn') as HTMLButtonElement;
   const successMsg = document.getElementById('success-msg') as HTMLDivElement;
   const select = document.getElementById('event-type') as HTMLSelectElement;
+  const dateInput = document.getElementById('event-date') as HTMLInputElement;
 
   const fields = form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
     'input[required], select[required], textarea[required]'
@@ -216,6 +247,10 @@ const photos = Object.values(modules).map(m => m.default);
     checkAllFilled();
   });
 
+  dateInput.addEventListener('input', () => {
+    dateInput.classList.toggle('has-value', dateInput.value !== '');
+  });
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
 
@@ -223,6 +258,7 @@ const photos = Object.values(modules).map(m => m.default);
     const email = (document.getElementById('email') as HTMLInputElement).value.trim();
     const phone = (document.getElementById('phone') as HTMLInputElement).value.trim();
     const eventType = select.value;
+    const eventDate = (document.getElementById('event-date') as HTMLInputElement).value;
     const message = (document.getElementById('message') as HTMLTextAreaElement).value.trim();
 
     btn.disabled = true;
@@ -232,7 +268,7 @@ const photos = Object.values(modules).map(m => m.default);
       const res = await fetch('/submit-form', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, eventType, message }),
+        body: JSON.stringify({ name, email, phone, eventType, eventDate, message }),
       });
 
       if (!res.ok) {

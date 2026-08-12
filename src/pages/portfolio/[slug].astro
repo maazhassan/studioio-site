@@ -1,9 +1,19 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Image, getImage } from 'astro:assets';
+import { galleries } from '../../data/galleries';
+
+export function getStaticPaths() {
+  return galleries.map((gallery) => ({
+    params: { slug: gallery.slug },
+    props: { gallery },
+  }));
+}
+
+const { gallery } = Astro.props;
 
 const modules = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/images/portfolio/*.{jpg,JPG,jpeg,JPEG}',
+  '../../assets/images/portfolio/*.{jpg,JPG,jpeg,JPEG,webp}',
   { eager: true },
 );
 
@@ -13,37 +23,15 @@ for (const [path, mod] of Object.entries(modules)) {
   byName[basename] = mod.default;
 }
 
-// A740980 is not present in assets — skipped
-const columns = [
-  {
-    widthPx: 350,
-    files: [
-      '_A740217.jpg', '_A741207.jpg', 'DSC00057.JPG', '_A740445.jpg',
-      '_A740991.jpg', '_A740965.jpg', '_A740975.jpg', '_A741272.jpg', '_A741263.jpg',
-      '_A741295.jpg', '123.jpeg', '_A740223.jpg',
-    ],
-  },
-  {
-    widthPx: 428,
-    files: [
-      '_A740908.jpg', '_A740403.jpg', '_A741793.jpg', '_A741283.jpg',
-      '_A741013.jpg', '_A740935.jpg', '_A741772.jpg', '_A740912.jpg',
-      'DSC00144.JPG', '_A741315.jpg', '_A740909.jpg',
-    ],
-  },
-  {
-    widthPx: 350,
-    files: [
-      '_A740960.jpg', '_A741957.jpg', '_A741276.jpg', '_A741053.jpg',
-      'DSC00168.JPG', '_A740956.jpg', '_A741045.jpg', 'DSC00175.JPG',
-      '_A741969.jpg', '_A740944.jpg', 'DSC00044.JPG',
-    ],
-  },
-];
+const columnWidths = [376, 376, 376];
+
+const orderedFiles = gallery.files
+const columns = columnWidths.map((widthPx) => ({ widthPx, files: [] as string[] }));
+orderedFiles.forEach((file, i) => columns[i % 3].files.push(file));
 
 // Flatten for lightbox indexing (left → middle → right, top → bottom)
-const flatPhotos = columns.flatMap(col =>
-  col.files.filter(f => byName[f]).map(file => ({ file, widthPx: col.widthPx }))
+const flatPhotos = columns.flatMap((col) =>
+  col.files.map((file) => ({ file, widthPx: col.widthPx }))
 );
 
 const largePhotos = await Promise.all(
@@ -60,25 +48,27 @@ let eagerCount = 0;
 ---
 
 <BaseLayout
-  title="Portfolio"
-  description="Browse the Studio.io portfolio — a collection of cherished moments and beautiful love stories."
+  title={`${gallery.title} — Portfolio`}
+  description={`${gallery.subtitle} — browse the ${gallery.title} gallery from Studio.io.`}
 >
   <div class="max-w-300 mx-auto px-2 sm:px-4">
 
     <!-- Heading -->
     <div class="pt-10 md:pt-14 pb-8 text-center">
-      <h1 class="font-serif text-5xl md:text-6xl text-coffee-bean">Portfolio</h1>
+      <a href="/portfolio" class="text-sm text-olive hover:text-coffee-bean transition-colors duration-200">&larr; Back to Portfolio</a>
+      <h1 class="mt-2 font-serif text-5xl md:text-6xl text-coffee-bean">{gallery.title}</h1>
+      <p class="mt-2 font-sans tracking-widest uppercase text-xs font-semibold text-olive">{gallery.subtitle}</p>
     </div>
 
     <!-- Grid -->
-    <section aria-label="Portfolio gallery">
+    <section aria-label={`${gallery.title} gallery`}>
       <div class="flex flex-col md:flex-row md:justify-center gap-1.5">
         {columns.map((col) => (
           <div
             class="flex flex-col gap-1.5 w-full md:shrink-0"
             style={`--col-w: ${col.widthPx}px`}
           >
-            {col.files.filter(f => byName[f]).map((file) => {
+            {col.files.map((file) => {
               const idx = lightboxIdx[file];
               const large = largePhotos[idx];
               const photo = byName[file];
